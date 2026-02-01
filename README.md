@@ -1,4 +1,16 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Paraphraser
+
+A simple AI Text Paraphraser built with Next.js App Router, TypeScript, TailwindCSS, and shadcn/ui. Paste text, choose a rewrite style, and get a paraphrased version from the OpenAI API.
+
+## Environment
+
+Copy `.env.local.example` to `.env.local` and set your OpenAI API key:
+
+```bash
+cp .env.local.example .env.local
+```
+
+Get an API key at [OpenAI API Keys](https://platform.openai.com/api-keys). The app uses it only on the server for paraphrasing.
 
 ## Getting Started
 
