@@ -1,16 +1,16 @@
 # AI Paraphraser
 
-A simple AI Text Paraphraser built with Next.js App Router, TypeScript, TailwindCSS, and shadcn/ui. Paste text, choose a rewrite style, and get a paraphrased version from the OpenAI API.
+A simple AI Text Paraphraser built with Next.js App Router, TypeScript, TailwindCSS, and shadcn/ui. Paste text, choose a rewrite style, and get a paraphrased version from the Google Gemini API.
 
 ## Environment
 
-Copy `.env.local.example` to `.env.local` and set your OpenAI API key:
+Copy `.env.local.example` to `.env.local` and set your Gemini API key:
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-Get an API key at [OpenAI API Keys](https://platform.openai.com/api-keys). The app uses it only on the server for paraphrasing.
+Get an API key at [Google AI Studio](https://aistudio.google.com/apikey). The app uses it only on the server for paraphrasing.
 
 ## Getting Started
 

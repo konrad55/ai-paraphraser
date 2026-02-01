@@ -1,7 +1,6 @@
 "use server";
 
-import OpenAI from "openai";
-import type { APIError } from "openai";
+import { GoogleGenAI } from "@google/genai";
 import type { RewriteStyle } from "@/types/paraphrase";
 import { isRewriteStyle, REWRITE_STYLE_INSTRUCTIONS } from "@/types/paraphrase";
 
@@ -13,7 +12,7 @@ const SYSTEM_PROMPT = `You are a paraphrasing assistant. Rewrite the user's text
 
 export async function paraphrase(
   text: string,
-  style: string,
+  style: string
 ): Promise<ParaphraseResult> {
   const trimmed = text?.trim() ?? "";
   if (!trimmed) {
@@ -24,52 +23,60 @@ export async function paraphrase(
     return { error: "Invalid rewrite style selected." };
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return { error: "Server is not configured with an OpenAI API key." };
+    return { error: "Server is not configured with a Gemini API key." };
   }
 
   const instruction = REWRITE_STYLE_INSTRUCTIONS[style as RewriteStyle];
   const userMessage = `${instruction}\n\nText to paraphrase:\n\n${trimmed}`;
 
   try {
-    const openai = new OpenAI({ apiKey });
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userMessage },
-      ],
-      max_tokens: 1024,
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: userMessage,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        maxOutputTokens: 1024,
+      },
     });
 
     // Log full API response (visible in server terminal)
     console.log(
-      "[paraphrase] OpenAI API response:",
-      JSON.stringify(completion, null, 2),
+      "[paraphrase] Google GenAI API response:",
+      JSON.stringify(
+        {
+          text: response.text,
+          candidates: response.candidates,
+          usageMetadata: response.usageMetadata,
+        },
+        null,
+        2
+      )
     );
 
-    const content = completion.choices[0]?.message?.content?.trim();
+    const content = response.text?.trim();
     if (content == null || content === "") {
       return { error: "The AI did not return any paraphrased text." };
     }
 
     return { data: content };
   } catch (err) {
-    // 429 = quota exceeded or rate limit – user needs to check billing
+    // Quota or rate limit – user needs to check billing / quota
+    const message =
+      err instanceof Error ? err.message : "An unexpected error occurred.";
     if (
-      err &&
-      typeof err === "object" &&
-      "status" in err &&
-      (err as APIError).status === 429
+      typeof message === "string" &&
+      (message.includes("429") ||
+        message.includes("quota") ||
+        message.includes("resource exhausted"))
     ) {
       return {
         error:
-          "Przekroczono limit konta OpenAI. Sprawdź rozliczenia i doładuj środki: https://platform.openai.com/account/billing",
+          "Przekroczono limit konta Google AI. Sprawdź rozliczenia i limit: https://aistudio.google.com/",
       };
     }
-    const message =
-      err instanceof Error ? err.message : "An unexpected error occurred.";
     return { error: `Paraphrasing failed: ${message}` };
   }
 }
