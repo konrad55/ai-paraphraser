@@ -42,20 +42,6 @@ export async function paraphrase(
       },
     });
 
-    // Log full API response (visible in server terminal)
-    console.log(
-      "[paraphrase] Google GenAI API response:",
-      JSON.stringify(
-        {
-          text: response.text,
-          candidates: response.candidates,
-          usageMetadata: response.usageMetadata,
-        },
-        null,
-        2
-      )
-    );
-
     const content = response.text?.trim();
     if (content == null || content === "") {
       return { error: "The AI did not return any paraphrased text." };
