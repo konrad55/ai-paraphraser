@@ -4,7 +4,7 @@ A simple AI Text Paraphraser built with Next.js App Router, TypeScript, Tailwind
 
 ## Environment
 
-Set your Gemini API key in `.env.local`
+Set your Gemini API key in `.env.local` as `GEMINI_API_KEY` variable.
 
 Get an API key at [Google AI Studio](https://aistudio.google.com/apikey). The app uses it only on the server for paraphrasing.
 
